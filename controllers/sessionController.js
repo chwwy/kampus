@@ -3,9 +3,12 @@ const Session = require('../models/Session');
 
 exports.startSession = async (req, res) => {
   const { cardId } = req.body;
+  console.log('Received cardId:', cardId);
 
   try {
     const user = await User.findOne({ cardId });
+    console.log('User found:', user);
+
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const session = new Session({
@@ -16,7 +19,7 @@ exports.startSession = async (req, res) => {
     await session.save();
     res.status(201).json({ message: 'Session started', sessionId: session._id });
   } catch (err) {
-    console.error(err);
+    console.error('Error in startSession:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -84,21 +87,34 @@ exports.getSessionHistory = async (req, res) => {
 
 exports.getLatestActiveSession = async (req, res) => {
   try {
-    const latest = await Session.findOne({ endTime: null })
-      .sort({ startTime: -1 })
-      .populate('userId');
+    console.log('🔍 Looking for latest session...');
+    const latest = await Session.findOne({ endTime: null }).sort({ startTime: -1 });
 
-    if (!latest || !latest.userId) {
+    if (!latest) {
+      console.log('⚠️ No active session found');
       return res.status(404).json({ message: 'No active session found' });
     }
 
+    console.log('✅ Found session:', latest);
+    console.log('🔍 Looking for userId:', latest.userId);
+
+    const user = await User.findById(latest.userId);
+
+    if (!user) {
+      console.log('❌ User not found for userId:', latest.userId);
+      return res.status(404).json({ message: 'User not found for latest session' });
+    }
+
+    console.log('✅ Found user:', user);
+
     res.json({
-      cardId: latest.userId.cardId,
+      cardId: user.cardId,
       userExists: true,
       startTime: latest.startTime
     });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Server error in getLatestActiveSession:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
