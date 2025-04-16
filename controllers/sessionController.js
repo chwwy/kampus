@@ -86,3 +86,24 @@ exports.getSessionHistory = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+exports.getLatestActiveSession = async (req, res) => {
+  try {
+    const latest = await Session.findOne({ endTime: null })
+      .sort({ startTime: -1 })
+      .populate('userId'); // populate user info including cardId
+
+    if (!latest || !latest.userId) {
+      return res.status(404).json({ message: 'No active session found' });
+    }
+
+    res.json({
+      cardId: latest.userId.cardId,      // from populated user
+      userExists: true,                  // always true if populated
+      startTime: latest.startTime
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
