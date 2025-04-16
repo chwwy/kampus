@@ -14,15 +14,10 @@ exports.startSession = async (req, res) => {
     });
 
     await session.save();
-
-    res.status(200).json({
-      message: 'Session started',
-      sessionId: session._id,
-      startTime: session.startTime
-    });
+    res.status(201).json({ message: 'Session started', sessionId: session._id });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -91,15 +86,15 @@ exports.getLatestActiveSession = async (req, res) => {
   try {
     const latest = await Session.findOne({ endTime: null })
       .sort({ startTime: -1 })
-      .populate('userId'); // populate user info including cardId
+      .populate('userId');
 
     if (!latest || !latest.userId) {
       return res.status(404).json({ message: 'No active session found' });
     }
 
     res.json({
-      cardId: latest.userId.cardId,      // from populated user
-      userExists: true,                  // always true if populated
+      cardId: latest.userId.cardId,
+      userExists: true,
       startTime: latest.startTime
     });
   } catch (err) {
