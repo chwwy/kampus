@@ -39,12 +39,19 @@ export const endSession = async (req, res) => {
     if (!session) return res.status(404).json({ message: 'No active session found' });
 
     const weight = user.weight;
-    const distance = tickCount * 1.0;
-    const calories = parseFloat((tickCount * 0.001 * 0.9 * weight).toFixed(3));
+    const gender = user.gender; // 1 = male, 2 = female
+    const ethnicity = 3; // Assuming all users are Asians
+
+    const distanceInMeters = tickCount * 1.0;
+    const distanceInMiles = distanceInMeters / 1609.34;
+
+    const caloriesPerMile = (0.978 * weight) - (4.571 * gender) + (3.524 * ethnicity) + 32.447;
+    const calories = parseFloat((distanceInMiles * caloriesPerMile).toFixed(3));
+
     const endTime = new Date();
 
     session.tickCount = tickCount;
-    session.distance = distance;
+    session.distance = distanceInMeters;
     session.calories = calories;
     session.endTime = endTime;
 
@@ -54,7 +61,7 @@ export const endSession = async (req, res) => {
       message: 'Session ended',
       sessionId: session._id,
       tickCount,
-      distance,
+      distance: distanceInMeters,
       calories,
       startTime: session.startTime,
       endTime

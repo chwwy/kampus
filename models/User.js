@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
   weight: {
     type: Number,
     required: true
+  },
+  gender: {
+    type: Number, // 1 for male, 2 for female
+    required: true
   }
 }, { timestamps: true });
 

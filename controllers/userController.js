@@ -4,7 +4,7 @@ exports.createUser = async (req, res) => {
   const { cardId, name, weight } = req.body;
 
   if (!cardId || !name || !weight) {
-    return res.status(400).json({ message: 'cardId, name, and weight are required' });
+    return res.status(400).json({ message: 'cardId, name, sex, and weight are required' });
   }
 
   try {
@@ -21,7 +21,8 @@ exports.createUser = async (req, res) => {
       userId: newUser._id,
       cardId,
       name,
-      weight
+      weight,
+      gender
     });
   } catch (err) {
     console.error(err);
