@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const Session = require('../models/Session');
-const sessionController = require('../controllers/sessionController');
+const sessionController = require('../controllers/sessionController'); // Import full controller
 
 router.post('/start', sessionController.startSession);
 router.post('/end', sessionController.endSession);
 router.get('/active-latest', sessionController.getLatestActiveSession);
 router.get('/:cardId', sessionController.getSessionHistory);
+router.post('/check-user', sessionController.checkUserExistence); // ✅ Fix here
   
-  module.exports = router; // ✅ MUST BE PRESENT
+module.exports = router;

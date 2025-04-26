@@ -1,7 +1,7 @@
-const User = require('../models/User');
-const Session = require('../models/Session');
+import User from '../models/User.js';
+import Session from '../models/Session.js';
 
-exports.startSession = async (req, res) => {
+export const startSession = async (req, res) => {
   const { cardId } = req.body;
   console.log('Received cardId:', cardId);
 
@@ -24,7 +24,7 @@ exports.startSession = async (req, res) => {
   }
 };
 
-exports.endSession = async (req, res) => {
+export const endSession = async (req, res) => {
   const { cardId, tickCount } = req.body;
 
   try {
@@ -65,7 +65,7 @@ exports.endSession = async (req, res) => {
   }
 };
 
-exports.getSessionHistory = async (req, res) => {
+export const getSessionHistory = async (req, res) => {
   const { cardId } = req.params;
 
   try {
@@ -85,7 +85,7 @@ exports.getSessionHistory = async (req, res) => {
   }
 };
 
-exports.getLatestActiveSession = async (req, res) => {
+export const getLatestActiveSession = async (req, res) => {
   try {
     console.log('🔍 Looking for latest session...');
     const latest = await Session.findOne({ endTime: null }).sort({ startTime: -1 });
@@ -118,3 +118,21 @@ exports.getLatestActiveSession = async (req, res) => {
   }
 };
 
+export const checkUserExistence = async (req, res) => {
+  try {
+    const { cardId } = req.body;
+    if (!cardId) {
+      return res.status(400).json({ message: 'cardId is required' });
+    }
+
+    const user = await User.findOne({ cardId });
+    if (user) {
+      return res.json({ userExists: true });
+    } else {
+      return res.json({ userExists: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
