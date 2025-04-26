@@ -1,10 +1,9 @@
 const User = require('../models/User');
 
 exports.createUser = async (req, res) => {
-  const { cardId, name, weight } = req.body;
-
-  if (!cardId || !name || !weight) {
-    return res.status(400).json({ message: 'cardId, name, sex, and weight are required' });
+  const { cardId, name, weight, gender } = req.body; 
+  if (!cardId || !name || !weight || !gender) { 
+    return res.status(400).json({ message: 'cardId, name, weight, and gender are required' });
   }
 
   try {
@@ -13,7 +12,7 @@ exports.createUser = async (req, res) => {
       return res.status(409).json({ message: 'cardId already exists' });
     }
 
-    const newUser = new User({ cardId, name, weight });
+    const newUser = new User({ cardId, name, weight, gender }); 
     await newUser.save();
 
     res.status(201).json({
